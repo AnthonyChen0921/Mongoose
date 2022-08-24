@@ -26,6 +26,7 @@
                         <form action="/delete-order" method="POST">
                             <input type="hidden" value="<%= order._id %>" name="orderId">
                             <button class="primary" type="submit">Cancel Order</button>
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                         </form>
                     <% }); %>
                 </ul>
