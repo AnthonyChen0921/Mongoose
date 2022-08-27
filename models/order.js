@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const orderSchema = new Schema({
   user: {
-    name: {
+    email: {
       type: String,
       required: true,
     },
@@ -16,7 +16,7 @@ const orderSchema = new Schema({
   },
   products: [
     {
-      productData: {
+      product: {
         type: Object,
         required: true,
       },

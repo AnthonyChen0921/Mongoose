@@ -80,20 +80,19 @@ exports.postCartDeleteProduct = (req, res, next) => {
     .catch((err) => console.log(err));
 };
 
-exports.postOrder = (req, res, next) => {
-  req.user
-    .populate("cart.items.productId")
-    .execPopulate()
+exports.postOrder = async (req, res, next) => {
+  await req.user
+    .populate(['cart.items.productId'])
     .then((user) => {
       const products = user.cart.items.map((item) => {
         return {
-          productData: { ...item.productId._doc },
+          product: { ...item.productId._doc },
           quantity: item.quantity,
         };
       });
       const order = new Order({
         user: {
-          name: req.user.name,
+          email: req.user.email,
           userId: req.user,
         },
         products: products,

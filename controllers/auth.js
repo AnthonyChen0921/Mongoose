@@ -1,3 +1,5 @@
+const { validationResult } = require("express-validator");
+
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
@@ -82,39 +84,49 @@ exports.postSignup = (req, res, next) => {
   const password = req.body.password;
   const confirmPassword = req.body.confirmPassword;
 
-  User.findOne({ email: email }).then((user) => {
-    if (user) {
-      req.flash("error", "Email already exists");
-      return res.redirect("/signup");
-    }
-    return bcrypt
-      .hash(password, 12)
-      .then((hashedPassword) => {
-        const user = new User({
-          email: email,
-          password: hashedPassword,
-          cart: { items: [] },
-        });
-        return user.save();
-      })
-      .then((result) => {
-        res.redirect("/login");
-        const msg = {
-          to: email,
-          from: "chenerdong0921@gmail.com",
-          subject: "Signup succeeded",
-          html: "<h1> You successfully signed up! </h1>",
-        };
-        return sgMail.send(msg, (err, result) => {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log("Successfully sent! ");
-          }
-        });
-      })
-      .catch((err) => console.log(err));
-  });
+  // validate the form data
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    req.flash("error", errors.array()[0].msg);
+    return res.status(422).render("auth/signup", {
+      path: "/signup",
+      pageTitle: "Signup",
+      errorMessage: errors.array()[0].msg,
+    });
+  }
+  
+  // instanly create a user object
+  bcrypt
+    .hash(password, 12)
+    .then((hashedPassword) => {
+      // create a new user
+      const user = new User({
+        email: email,
+        password: hashedPassword,
+        cart: { items: [] },
+      });
+
+      // save the user to the database
+      return user.save();
+    })
+    .then((result) => {
+      res.redirect("/login");
+
+      // send an email to the user
+      const msg = {
+        to: email,
+        from: "chenerdong0921@gmail.com",
+        subject: "Signup succeeded",
+        html: "<h1> You successfully signed up! </h1>",
+      };
+      return sgMail.send(msg, (err, result) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("Successfully sent! ");
+        }
+      });
+    });
 };
 
 exports.getReset = (req, res, next) => {
@@ -257,4 +269,4 @@ exports.postNewPassword = (req, res, next) => {
       res.redirect("/login");
     })
     .catch((err) => console.log(err));
-}
+};

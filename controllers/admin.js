@@ -1,5 +1,22 @@
+/*
+  This file is used to store all admin controller methods.
+  Admin user can have full access to the products in the database.
+  Admin actions include:
+      - adding a new product
+      - deleting a product
+      - editing a product
+
+ */
+
+// -------------------------------------------------------------- //
+// import the product models from the models folder
 const Product = require("../models/product");
 
+/*
+  getAddProduct method is used to render the add-product page.
+  The method checks if the user is authenticated. If not, the user is redirected to the home page.
+  The session is saved in the req.session object and in the database.
+*/
 exports.getAddProduct = (req, res, next) => {
   if (!req.session.isLoggedIn) {
     return res.redirect("/login");
@@ -11,6 +28,11 @@ exports.getAddProduct = (req, res, next) => {
   });
 };
 
+/*
+  postAddProduct method is used to add a new product to the database.
+  The method extracts the data from the form and saves it in the database.
+  product.save() is a mongoose method that saves the data in the database.
+*/
 exports.postAddProduct = (req, res, next) => {
   const title = req.body.title;
   const imageUrl = req.body.imageUrl;
@@ -35,6 +57,12 @@ exports.postAddProduct = (req, res, next) => {
     });
 };
 
+/**
+ * getEditProduct method is used to render the edit-product page.
+ * The method checks if edit product is authenticated. If not, the user is redirected to the home page.
+ * prodId is extracted from the form name attribute and is used to find the product in the database.
+ * The product is then rendered in the edit-product page.
+ */
 exports.getEditProduct = (req, res, next) => {
   const editMode = req.query.edit;
   if (!editMode) {
