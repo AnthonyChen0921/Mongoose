@@ -6,7 +6,7 @@ const crypto = require("crypto");
 const sgMail = require("@sendgrid/mail");
 const console = require("console");
 sgMail.setApiKey(
-  "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"
+  ""
 );
 
 // getLogin - GET /login
